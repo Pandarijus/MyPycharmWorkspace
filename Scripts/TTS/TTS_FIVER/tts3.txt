@@ -1,0 +1,140 @@
+2.5 Szenario 3: Verkehrsschilder
+Beschreibung:
+In diesem Szenario wird die Strecke mit Schildern versehen, bei dem das Fahrzeug
+situationsbedingt reagieren muss. Dabei wurde der Fokus darauf gelegt, dass das Fahrzeug
+selbstständig Stoppschilder erkennen und anhand der Geschwindigkeitsschilder die
+Geschwindigkeit regeln kann. Folgend wird das Szenario in zwei Teile geteilt.
+Abbildung 26: Parameter eines Sensors
+25
+2.5.1 Geschwindigkeitsschilder
+Vorgehen:
+Zuerst musste nach passenden Assets im Unity Asset Store gesucht
+werden. Nach längerer Suche wurde ein kostenloses, amerikanisches
+Asset gefunden. Da dies für das deutsche Verkehrssystem eher
+unbrauchbar ist, da es „SPEED LIMIT 50 oder 100“ zeigt (siehe Abb.
+28), musste nach einer Möglichkeit gesucht werden, wie man die
+Texturen und die Materialien eines Objekts - in diesem Fall der
+implementierten Assets - ändern kann. Zu Beginn war es erforderlich,
+dass ein 50er oder 100er Geschwindigkeitsschild als PNG-Datei abgespeichert wird. Diese
+Datei muss, wie in Abbildung 29 zu sehen, konstruiert werden, da dies das optimale Format
+von Unity für dieses Objekt ist.
+Anschließend wird diese PNG-Datei in
+Unity als neues Asset hochgeladen und als
+Material und Textur abgelegt. Damit das
+selbsterstellte 50er-Schild auch verwendet
+werden kann, muss die PNG-Datei als
+Material oder Textur auf das „Speed Limit
+50“-Schild gezogen und dann als transparente Grafik ausgeschnitten werden. Das Format und
+die Rotation haben den Grund, dass Unity mit diesem Asset Texturen oder Materialien
+zuweisen kann. In Abbildung 30 und 31 ist zu sehen, wie sich die Textur oder das Material in
+Unity integriert hat.
+Im letzten Schritt musste lediglich die alte Maske gelöscht werden, da diese aus einer größeren
+Distanz noch zu sehen war. Da nun das 50er oder 100er Schild als Objekt in der Unity
+Umgebung existieren, musste der Tag dieser Schilder auch als 50er oder 100er Schild gesetzt
+Abbildung 28: Darstellung
+des FREE Traffic Essentials
+Asset Pack
+Abbildung 29: 50er und 100er Schild (Originalverhältnis)
+Abbildung 30: Textur des 50er-Schilds Abbildung 31: Material des 50er Schilds
+26
+werden, damit der Raycastsensor auf diese beim Scannen des Box Colliders reagieren kann,
+wie in Abbildung 32 zu sehen ist.
+Damit dies funktioniert, muss der Code für die Raycasts zur Erkennung der hinterlegten Tags
+geschrieben werden. In Abbildung 33 ist der Code für das Scannen der Tags zu sehen.
+Dieser Code beginnt in Zeile 113 damit, dass er anhand des Raycasts die Umgebung abscannt.
+Sollte er also, wie in Zeile 116 geschrieben, auf ein Collider-Tag mit dem Namen „50erSchild“
+treffen, richtet er, wie in Zeile 118 geschrieben, den Raycast auf das Objekt zur Verdeutlichung
+aus und legt seine maximale Geschwindigkeit auf einen neuen Wert fest, wie in Zeile 119 zu
+sehen ist. Bei dem Tag „50erSchild“ setzt er diesen auf 50 km/h und beim „100erSchild“ auf
+100km/h und zeigt im Game View anhand eines digitalen Tachos die neue Geschwindigkeit an
+(siehe Abbildung 34 und 35).
+Abbildung 32: Inspector des 50er Schilds
+Abbildung 33: Scannen der Tags eines Schilds
+Abbildung 34: Fahrendes Auto mit 50 km/h Abbildung 35: Fahrendes Auto mit 100 km/h
+27
+Der Code in der Abbildung 36 erstellt einen Canvas, ähnlich einem Bilderrahmen im Game
+View, der den digitalen Tacho (Geschwindigkeit), wie in Abbildung 33 und 34, zeigt. Dieser
+erstellt eine transparente Vorschau des Monitors, wozu die Auflösung des Monitors angeben
+werden muss. Da heutzutage fast jeder Monitor auf Full HD läuft, musste der Canvas auf
+1920x1080 eingestellt werden.
+Durch diesen Canvas kann man die ausgewählten Daten immer in erster Rangfolge auf der
+Oberfläche anzeigen lassen. Diese Daten oder in unserem Fall der Text der aktuellen
+Geschwindigkeit wird deswegen immer an fester Stelle unseres Game Views gezeigt. In
+Abbildung 37 sieht man, dass der Canvas zunächst nur „Geschwindigkeit:“ zeigt, da das
+Szenario noch nicht gestartet wurde und der Text über die Codezeile 28 - 29 in Abbildung 36
+auf die Geschwindigkeitsübermittlung der Engine wartet.
+Abbildung 36: Erstellung des digitalen Tachos
+28
+Wird das Szenario gestartet frägt die Engine dauerhaft die Geschwindigkeit des Fahrzeugs ab
+und zeigt diese innerhalb des Canvas wie in Abbildung 38 in km/h an (vgl. Codezeile 28 - 29
+in Abb. 36). Der Canvas ist auf diese Weise „eingerahmt“ aber nur im Szene View zu sehen,
+im Game View werden nur die Daten angezeigt, welche durch den Canvas an fester Stelle
+projiziert werden.
+Eine Geschwindigkeitsänderung ist nur möglich, da die Geschwindigkeit des Fahrzeugs über
+die CarEngine beziehungsweise der sich drehenden Reifen berechnet wird. So beschleunigt das
+Fahrzeug bis zu einem maxSpeed und hält dann bis zur Änderung dieses Wertes die gleiche
+Geschwindigkeit.
+Probleme & Lösungen:
+Die erste Überlegung für dieses Szenario war das Einsetzen eines Vektors der Klasse 3, welcher
+anhand der Koordinaten x, y und z die Bewegungen übergibt. Dies sollte dazu führen, dass dem
+Abbildung 37: Canvas Geschwindigkeit in nicht gestartetem Zustand
+Abbildung 38: Canvas Geschwindigkeit in gestartetem Zustand
+29
+Fahrzeug eine feste Richtung im Raum zugeteilt wird. Hierfür hätte das Koordinatensystem
+aber dem Fahrzeug zugewiesen werden müssen, da sich in Kurvensituationen die Orientierung
+des Autos innerhalb des Koordinatensystems ändern würde. Folglich wäre das
+Koordinatensystem eine Untergruppe des Fahrzeugs geworden und hätte sich wie die
+„MainCamera“ mit dem Fahrzeug mitbewegt. Die Recherche für dieses Verfahren gab aber
+aus, dass diese Art von Programmierung veraltet sei, da es im späteren Verlauf weiterer
+koordinatensystemabhängiger Komponenten zu Überschneidungen kommen würde. Aus
+diesem Grund war das Verwenden dieses Verfahrens keine Alternative mehr, da man so
+mehrere Koordinatensysteme hätte integrieren müsse und dies unnötig kompliziert gewesen
+wäre. Wäre dieser Ansatz weiterverfolgt worden, dann hätte das Auto beim ersten
+Richtungswechsel in eine falsche Richtung weiter beschleunigt, da sich das Auto versetzt zum
+eigentlichen Koordinatensystem bewegt hätte. Es wäre angegeben gewesen, dass sich der
+Vektor 3 in x-Richtung auf den maxSpeed Wert x verändern müsste, das Fahrzeug sich aber
+mittlerweile in y-Richtung bewegt.
+2.5.2 Stoppschilder
+Vorgehen:
+Beim Stoppschild wird ähnlich wie bei dem Geschwindigkeitsschild vorgegangen. Als erstes
+mussten wieder Assets im Store gesucht werden, welche direkt implementiert werden können.
+Da bereits ein kostenloses Asset für ein Stoppschild existierte, wurde hierfür keine PNG-Grafik
+benötigt. So war es gleich möglich, das Asset des Stoppschilds in Unity zu implementieren und
+dies in der Unity Umgebung zu integrieren. Dieses Stoppschild wurde wieder mit einem Tag
+versehen, damit es durch den Raycastsensor erkannt werden kann, siehe Abbildung 39.
+Abbildung 39: Stoppschild-Tag
+30
+Damit man in diesem Szenario sieht, dass das Fahrzeug nur getaggte Objekte erkennt, wurde
+bei einem Stoppschild das Tag weggelassen. Dies führt dazu, dass das Fahrzeug ohne
+Ausschlag des Raycasts am Stoppschild vorbeifährt.
+Das zweite Stoppschild ist mit dem Tag „Stoppschild“ versehen und in die Unity-Umgebung
+eingefügt. Hierfür musste man den Code schreiben, der dem Fahrzeug anhand des gescannten
+Tags sagt, dass dies 5 Sekunden stehen bleiben soll.
+Der Code hierfür beginnt wieder mit dem abscannen nach Tags in der Unity-Umgebung. Wenn
+dieser wie in der Codezeile 94 auf den Tag „Stoppschild“ trifft, visualisiert der Raycast dies
+anhand einer gezeichneten Linie (vgl. Codezeile 96 in Abbildung 40 und Abbildung 41).
+Anschließend wird dem Fahrzeug anhand der Funktion mitgeteilt, dass es das Bremsmoment
+für fünf Sekunden auf Maximal setzen soll. Dies führt dazu, dass das Fahrzeug seine
+Geschwindigkeit komplett auf 0 km/h herunterbremst. Wie in den Codezeilen 99 - 101 zu sehen
+ist, muss hierbei eine „targetTime“ deklariert werden. Sollte diese „targetTime“ abgelaufen
+Abbildung 40: Code Stoppschild
+Abbildung 41: Raycast erkennt Stoppschild
+31
+sein, bekommt das Fahrzeug die Erlaubnis die Fahrt weiterhin von Node zu Node fortzusetzen
+und scannt dabei Umgebung nach weiteren Tags.
+Probleme & Lösungen:
+Anfangs wurde eine ähnliche Lösung verwendet, wie im aktuellen Zustand. Jedoch war das
+Problem, dass Unity jedes Frame aktualisierte, und somit ein zurücksetzen der „targetTime“
+unmöglich machte. Denn durch die ständige Aktualisierung wurde der Wert immer wieder auf
+fünf Sekunden gesetzt. Dies sorgte dafür, dass sich das Auto nicht mehr weiterbewegte. Die
+erste Lösung für dieses Problem war zunächst der Befehl „Thread.sleep()“. Dies sorgte jedoch
+dafür, dass das gesamte Spiel eingefroren wurde. Somit hat das Auto nicht gebremst, sondern
+die Unityumgebung pausiert. Da diese Lösung nicht zufriedenstellend war, wurde erneut eine
+Möglichkeit anhand von „targetTime“ gesucht. Letztlich musste die „targetTime“, wie anfangs
+auch, zu Beginn deklariert werden. Um das permanente Zurücksetzen zu verhindern, wurde
+dies in der Funktion „CheckWaypointDistance" eingefügt (siehe Abb. 42). Dadurch wird bei
+Kontakt mit einer Node die „targetTime“ wieder auf fünf zurückgesetzt.
+Abbildung 42: Zurücksetzen der "targetTime"
+32
+Abbildung 43: Struktogramm Ampel
+2.6 Szenario 4: Ampel

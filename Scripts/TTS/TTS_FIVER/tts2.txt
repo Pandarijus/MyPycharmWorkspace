@@ -1,0 +1,116 @@
+2.4 Szenario 2: Hinderniserkennung
+Beschreibung:
+Das Fahrzeug fährt wie in Szenario 1 selbstständig von einem Punkt A los und beschleunigt auf
+eine Geschwindigkeit v. Währenddessen scannt das Auto mithilfe von Raycasts, Sensoren mit
+einer bestimmten Reichweite, die Umgebung nach Objekten und Hindernissen ab. Erkennt das
+Auto ein Objekt oder Hindernis, bremst es auf v = 0 ab und scannt weiterhin dauerhaft das
+Umfeld, solange bis kein Hindernis mehr erkannt wird. Anschließend fährt das Auto wieder los
+und der Ablauf beginnt erneut.
+Struktogramm:
+Vorgehen:
+Zu Beginn wurde dieses Szenario erst einmal fiktiv durchgespielt, um zu überlegen, was man
+hierfür alles benötigen würde. Hierfür wurde das Vorgehen in zwei Schritte unterteilt.
+Im ersten Schritt war die Hinderniserkennung und im zweiten Schritt das automatische
+Abbremsen das Ziel. Für den Anfang sollten diese Szenarien zunächst manuell getestet werden
+können. Dadurch waren die ersten Vorbereitungsschritte für dieses Szenario definiert.
+Alle folgenden Schritte wurden auf Szenario 1, das selbstständige Fahren, aufgebaut.
+19
+Abbildung 14: Aktivierung der "Is Breaking" Variablen
+Im folgenden Schritt wurde das Szenario um die manuelle Bremse erweitert. Hierzu waren
+einige Änderungen im Code notwendig um eine Bremsfunktion einzubauen, angefangen mit
+dem public boolean „isBreaking“ = false (siehe Abb 13).
+Dieser Wert ist dauerhaft false, wenn man ihn nicht manuell aktiviert. Über die Schaltfläche im
+Inspector für das Car Engine Skript von Unity kann man einen Haken bei „Is Breaking“ setzen.
+Mit diesem Haken ändert man den Wert in „true“ und das Auto bremst dank folgender
+Funktion (siehe Abb.15) ab. Die Funktion bewirkt, dass das Auto zum Stehen kommt und die
+Bremskraft maximal ist, falls „isBreaking = true“ ist. Durch die else-Anweisung ab Zeile 191
+wird die Bremse wieder freigegeben.
+Abbildung 15: Umsetzung der Bremse
+Abbildung 13: Implementierung des booleschen Werts
+"isBreaking"
+20
+Nun war es möglich, dass das Auto durch Betätigen der Bremsschaltfläche abbremst und zum
+Stehen kommt. Somit war die Fähigkeit des manuellen Abbremsens gegeben.
+Im zweiten Schritt unseres Szenarios musste die Hinderniserkennung eingebaut werden.
+Hierfür mussten wir zunächst ein Hindernis einfügen. Dieses war schnell in Form einer
+Straßensperre über den Asset-Store gefunden (siehe Abb. 16).
+Dieses Objekt musste noch mit einem BoxCollider erweitert werden, damit die Sensoren später
+die Straßensperre auch erkennen konnten. Im nächsten Schritt wurden die Raycasts an das Auto
+angebracht. Um in Fahrtrichtung jegliche Objekte erkennen zu können, musste das Auto über
+mehr als nur einen Sensor verfügen. Der Plan sah vor, fünf Sensoren an der Autofront, drei in
+der Mitte und einen jeweils an der Seite zu platzieren. Die Anordnung wird in folgender
+Abbildung 17 veranschaulicht. Die seitlichen Sensoren werden benötigt, um Objekte, welche
+von links oder rechts auf die Fahrbahn gelangen, erkennen zu können.
+Abbildung 16: Straßensperre
+Abbildung 17: Realisierung der Sensoren
+Auto
+Sensor
+21
+Zuerst mussten im Code einige Variablen für Sensoren festgelegt werden. Durch diese werden
+die Parameter für die Sensoren definiert, beispielsweise in Zeile 32 die Sensorlänge oder in
+Zeile 35 der Winkel 30° für die äußeren Sensoren (siehe Abb. 18).
+Damit das Auto und die Sensoren auch auf Objekte reagieren können, musste der Code mit
+einer Funktion „Sensors“ für die Sensoren ergänzt werden, um zunächst die Position der
+Sensoren festzulegen (siehe Abb. 19).
+Zunächst wurde der erste Sensor in der Mitte erstellt. In Zeile 70 sind Parameter wie die Sensor-
+Startposition, die Ausrichtung oder die Sensorlänge vermerkt. Damit man die Sensoren auch
+erkennen kann, wenn sie auf ein Objekt treffen, wurde in Zeile 71 anhand von
+„Debug.DrawLine“ eine Funktion ergänzt, mit welcher der Raycast-Sensor sichtbar gemacht
+wurde.
+Dies musste im Folgenden mit den Sensoren für vorne links und rechts, sowie für die
+abgewinkelten an der Seite gemacht werden. Für den Sensor vorne rechts musste in Zeile 82
+die Position neu bestimmt werden. Der Sensor startet wieder in der Mitte des Autos, wird aber
+um ein Stück nach rechts verschoben (siehe Abb. 21).
+Abbildung 19: Bestimmen der Position der Sensoren
+Abbildung 18: Definieren der Parameter für die Sensoren
+Abbildung 20: Sensor vorne Mitte
+Abbildung 21: Sensor vorne rechts
+22
+Für den Sensor auf der linken Seite wird die Positionierung erneut geändert. Die
+Ausgangsposition ist nun allerdings nicht die Mitte, sondern die Position des rechten Sensors.
+Darum setzt man in Zeile 134 die Positionsveränderung *2, damit man die zweifache Länge
+nach links rückt. Würde man nur die einfache Länge nach links rücken, wäre man wieder in der
+Mitte und nicht links (siehe Abb. 22).
+Abschließend benötigt das Auto noch abgewinkelte Sensoren an den Seiten. Hierfür erweitert
+man die Position in Zeile 143 um den Winkelanteil „frontSensorAngle“, welcher oben als
+Variable schon mit 30° festgelegt wurde (s. Abb. 23).
+Nach dem selben Vorgehen wird auch der Sensor der rechten Seite platziert. Das Gleiche macht
+man auch zuletzt mit dem rechten abgewinkelten Sensor. Nun verfügt das Auto über 5
+Sensoren, die beim Auftreffen auf ein Objekt als Linie gezeichnet und erkannt werden können
+(siehe Abb. 24).
+Abbildung 22: Sensor vorne links
+Abbildung 24: Darstellung der umgesetzten Sensoren
+Abbildung 23: Sensor vorne links abgewinkelt
+23
+Ab diesem Punkt kann das Auto manuell über die Schaltfläche IsBreaking bremsen und verfügt
+über fünf Sensoreinheiten, welche auf Objekte reagieren können. Jetzt müssen beide
+Komponenten miteinander verbunden werden. Hierzu fügt man unter jeder Sensorfunktion, wie
+in Zeile 72 und 73 zu sehen, eine Bremsfunktion ein. Wenn der Sensor auf ein Objekt trifft, soll
+er gezeichnet (Zeile 71) und wie bei der manuellen Funktion die Bremskraft der Räder auf ein
+Maximum gesetzt werden. Um die Bremse erneut zu lösen, fügt man eine else-Anweisung ab
+Zeile 75 ein, welche die Bremskraft wieder auf null zurücksetzt. Diesen Schritt übernimmt man
+bei allen fünf Sensoren (siehe Abb. 25).
+Durch diese Erweiterung kann das Auto nun selbstständig bremsen sobald auch nur ein Sensor
+ein Objekt erkennt. Das Auto löst die Bremse erst wieder, wenn kein Objekt von einem Sensor
+mehr erkannt wird. Um das gesamte Szenario zu testen, werden auf dem Rundkurs zwei
+Straßensperren aufgestellt und das Auto für eine Rundfahrt gestartet. Sobald das Auto auf eine
+Straßensperre trifft, erkennen die Sensoren die Mauer und die Bremsen werden betätigt.
+Abbildung 25: Implementierung der Bremse und der Erkennung eines Objekts
+24
+Abbildung 27: Struktogramm Schilderkennung
+Probleme & Lösungen:
+Da die Sensorlänge zu Beginn zu kurz eingestellt war und
+das Auto noch auf die Mauer aufgefahren ist, mussten wir
+den Parameter „SensorLength“ von fünf auf acht erhöhen.
+Nun erkannte das Auto die Sperre rechtzeitig und kam
+genau vor der Mauer zum Stehen.
+Ein weiteres Problem war, dass die Sensoren sich in einer
+Kurvenfahrt nicht in Fahrtrichtung des Autos mitgedreht
+haben. Das Auto fuhr eine Rechtskurve aber die Sensoren
+haben durch das Auto nach links gezeigt. Um diesen
+Fehler zu beheben, haben wir die Variablen und Parameter
+im Skript sowie im Interface von Unity, dem Inspector,
+abgleichen müssen. Hier waren die Länge oder der Winkel
+abweichend voneinander eingestellt worden (siehe Abb.
+26).
+2.5 Szenario 3: Verkehrsschilde

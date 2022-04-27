@@ -1,0 +1,9 @@
+
+
+#control_variable = StringVar(window)
+#OPTION_TUPLE = ("Enlish", "Deutsch")
+#optionmenu_widget = OptionMenu(window,control_variable, *OPTION_TUPLE)
+#optionmenu_widget.sele
+#opt = OptionMenu(window,("Enlish", "Deutsch"),("Enlish"))
+#optionmenu_widget.pack()
+#opt.pack()

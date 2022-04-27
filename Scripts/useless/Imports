@@ -1,0 +1,21 @@
+import cv2 as cv
+import numpy as np
+from Scripts.Success import bigBrain as bs
+
+vid = cv.VideoCapture(0)
+
+while True:
+    isTrue,liveImage = vid.read()
+    liveImage = cv.flip(liveImage,1)
+
+
+
+
+
+
+
+    if bs.pressedKey('d'):
+        break
+
+vid.release()
+cv.destroyAllWindows()

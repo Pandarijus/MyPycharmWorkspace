@@ -1,0 +1,283 @@
+2.6 Szenario 4: Ampel
+Beschreibung:
+Eine Verkehrsampel ist vor einer Kreuzung positioniert. Die Lichter der Ampel sind per
+Tastendruck manuell ansteuerbar. Das Auto fährt an die Kreuzung heran, erkennt die Ampel
+und hält jeweils bei rot und rot-gelb und überquert die Kreuzung bei einem gelben und grünen
+Ampelsignal.
+Vorgehen:
+Das Ampel-Szenario baut auf den Szenarien um Hindernis- und Schilderkennung auf. Auch
+hierbei war unser Ansatz, das Auto über die Anwendung von Raycasts die Ampelvorrichtung
+grundsätzlich wie zuvor die Hindernisse und Verkehrsschilder erkennen zu lassen. Eine
+Ampelvorrichtung wurde im Unity Asset Store gefunden und bot das für dieses Szenario
+benötigte Schlüsselobjekt. Das Asset bestehend aus einem dezidierten Lichterkasten und der
+dazugehörigen Stange wurde zunächst zusammengesetzt und in entsprechender Position
+wenige Meter vor der Kreuzung, welche auch bereits in unseren vorigen Szenarien als
+Schauplatz diente, platziert. Im ersten Schritt galt es das Auto zunächst die Ampel
+grundsätzlich, ohne ausgegebenes Lichtsignal erkennen zu lassen. Hier wurde ebenfalls
+zunächst ein ähnliches Vorgehen wie in den vorigen Szenarien gewählt. Dem gesamten
+33
+Abbildung 44: Prüfung des "Ampel"-Tags
+GameObject „Ampel“ (bestehend aus Lichtkasten und Stand) wurde zunächst ein BoxCollider
+hinzugefügt. Demselben Game Object wurde dann ein neuer Tag namens „Ampel“ hinzugefügt.
+Im CarEngine-Skript kann dadurch an folgender Stelle die Erkennung des Ampel-Tags in Form
+einer if-Bedingung eingebunden werden:
+Wird also über einen Treffer des Raycasts eine Ampel erkannt, wird das Auto zunächst
+testweise vollständig anhalten (BrakeTorqueMax). Da das Auto für unseren ersten Testcase in
+der Lage ist die Ampel grundsätzlich zu erkennen, gilt es für den anstehenden Testcase, die
+Ampel leuchten zu lassen. Hierzu wurde in den Lichtkasten der Ampel eine Licht-Komponente
+eingefügt, durch welche die drei Ampelfarben, welche durch drei farbige runde Flächen in
+einem gemeinsamen Mesh hinterlegt sind, zum Leuchten gebracht werden können. Dadurch
+kann im nächsten Schritt erzielt werden, dass das Auto für den nächsten Testcase nur an der
+Ampel hält, wenn das hinterlegte Licht auch eingeschaltet ist. Falls dies nicht der Fall ist wird
+die Ampel einfach passiert. Dies erfordert allerdings zunächst die Möglichkeit, die Lichter
+gezielt ein- und ausschalten zu können. Um dies zu ermöglichen, wir ein dezidiertes Skript
+benötigt, welches an dieser Stelle „LichtAn“-Skript genannt wird. In diesem wird anfänglich
+der Boolean „on“ initiiert, welcher ausschlaggebend für die Erkennung des momentanen
+Zustandes der Ampel ist und zudem als public definiert werden muss, da auf sie im späteren
+Verlauf noch zugegriffen werden muss. Als Standard wird dieser Boolean auf den Zustand
+„false“ gesetzt. Im Folgenden wird dann durch eine if-Abfrage bestimmt, ob ein bestimmter
+Tasteninput geliefert wird (in diesem Beispiel Input durch das Drücken der Taste G) und
+welchen Leuchtzustand das Ampellicht momentan besitzt, also ob die boolsche Variable „on“
+den Wert wahr oder falsch besitzt, was in Zeile 12 der Abbildung 45 zu erkennen ist.
+Dementsprechend wird dann bei Tastendruck und ausgeschaltetem Zustand, also „on“-Variable
+mit hinterlegtem Wert „false“, über den Befehl „light.SetActive(true)“ das Licht aktiviert und
+der Boolean auf „wahr“ gesetzt. Bei erneutem Tastendruck und eingeschaltetem Zustand, also
+„on“-Variable mit hinterlegtem Wert „wahr“, wird nach selbigem Vorgehen das Licht
+ausgestellt und der Boolean auf den Wert „falsch“ gesetzt. Im fertigen Skript sieht dieses
+Vorgehen wie in der folgenden Abbildung 45 aus:
+34
+Abbildung 45: "LichtAn"-Skript zum Ein- und Ausschalten der Ampelbeleuchtung
+Abbildung 46: Abfrage des Leuchtzustandes der Ampel
+Für das Zwischenziel das Auto gezielt bei einem eingeschaltetem Ampellicht anhalten zu
+lassen, stellt sich nun die Frage, wie das selbstfahrende Auto unterscheiden kann zwischen
+einem eingeschalteten und einem ausgeschalteten Licht, da unser Raycast momentan nur
+Objekte erkennt und anhand zugeordneter Tags unterscheiden kann, allerdings nicht in der Lage
+ist, Eigenschaften wie ein eingeschaltetes, oder später eines von mehreren eingeschalteten
+Lichtern, auszulesen. Hierfür bietet es sich an, mit dem zur Verfügung stehenden Boolean „on“
+aus dem „LichtAn“-Skript zu arbeiten. Dieser ändert sich dynamisch mit dem jeweiligen
+Zustand des Ampellichts und könnte in der Update-Funktion des CarEngine-Skripts im
+selbstfahrenden Auto permanent abgefragt werden und somit immer eine passende Reaktion
+des selbstfahrenden Fahrzeugs hervorgerufen werden. Um dies erzielen zu können, wird
+zunächst das „LichtAn“-Skript innerhalb des „CarEngine“-Skriptes instanziiert. Hierfür wird
+der neuen Instanz innerhalb des CarEngine-Skripts der Name „MyLichtAnEngine“ vergeben.
+Um konkret auf eine Variable innerhalb dieses Skripts zuzugreifen, muss in der Funktion
+„Sensors“ vor der für den rechts abgewinkelten Sensor verantwortlichen if-Bedingung eine
+entsprechende Abfrage stattfinden. Der Zugriff für diese Abfrage ist in der folgenden
+Abbildung 46 in Zeile 90 zu erkennen:
+35
+Innerhalb der if-Bedingung für den abgewinkelten rechten Sensor des selbstfahrenden
+Fahrzeugs befindet sich die if-Bedingung die bereits in unserem ersten Schritt des Ampel-
+Szenarios dafür gesorgt hat, dass bei einem Auftreffen des Raycasts auf ein Hindernis (in
+diesem Fall die Ampel), das Fahrzeug zum Stehen kommt. Diese Bedingung muss für den
+jetzigen Zwischenschritt nun so erweitert werden, dass das Fahrzeug nur dann anhält, wenn die
+Ampel durch den Raycast erkannt wird und zudem der Boolean „on“ wahr ist und das
+Ampellicht dank des „LichtAn“-Skripts somit leuchtet. Die konkrete Abfrage dieses Booleans
+erfolgt dank der angefügten Bedingung „myLichtAnScript.on“, wie in Zeile 93 der obigen
+Abbildung 46 zu erkennen ist.
+Nachdem nun erreicht wurde, dass das selbstfahrende Fahrzeug bei einem leuchtenden
+Ampellicht zum Halt kommt, muss nun im nächsten Schritt erreicht werden, dass zwischen den
+drei verschiedenen Lichtern einer typischen Verkehrsampel unterschieden wird. Im hier
+verwendeten Ampel-Asset befanden sich die drei Lichter auf einem gemeinsamen Mesh und
+mussten zunächst auf drei einzelne Meshes mit jeweils einem der drei Ampellichter geteilt
+werden. Diese wurden folglich jeweils „Lights_Rot“, „Lights_Gelb“ und „Lights_Grün“
+benannt. Das Ansteuern erfolgt auf Basis unseres bereits benutzten „LichtAn“-Skripts. Dieses
+wird für jedes Licht einzeln dupliziert und entsprechend der angesteuerten Farbe
+„RotesLichtAn“, „GelbesLichtAn“ oder „GrünesLichtAn“ benannt. Diese drei Skripte werden
+als Komponenten hinter dem „Ampel“-Game Object verknüpft. In allen drei Skripten wurde
+nebst dem bereits erwähnten „on“-Boolean ebenfalls eine „public“-Variable mit dem Namen
+„lights“ hinterlegt. In unserem vorigen Zwischenschritt war hinter dieser Variablen noch das
+gesamte Mesh mit allen drei noch ungetrennten Lichtern hinterlegt. Da nun allerdings für jedes
+Licht einzeln ein dezidiertes Skript besteht, um diese auch einzeln ansprechen zu können, muss
+bei den entsprechenden „LichtAn“-Skripten das jeweils passende Einzellicht hinterlegt werden.
+Dies geschieht durch das Ziehen des jeweiligen Licht-Meshes aus der Hierarchy in die
+entsprechende Fläche der Varibalen im Unity User Interface (siehe Abb. 47).
+36
+Abbildung 47: Einsetzen der Licht-Meshes in die hinterlegten "LichtAn"-Skripte
+Zudem muss in diesen Skripten ebenfalls die jeweils auslösende Input-Taste verändert werden,
+da momentan noch alle Lichter über die hinterlegte G-Taste (de)aktiviert werden, wie auf
+Abbildung 2 in Zeile 12 unter „KeyCode.G“ zu erkennen ist. In diesem Szenario wurde nun die
+G-Taste für das gelbe Ampellicht als Schalter beibehalten. Für das rote Ampellicht wurde im
+verantwortlichen „RotesLichtAn“-Skript der Befehl „KeyCode.R“ hinterlegt um die R-Taste
+als Schalter zu aktivieren und analog dazu für das grüne Licht im entsprechenden Skript die
+Taste B. Damit ist es jetzt möglich mit den hinterlegten Tasten R, G und B die drei Lichter im
+Ampelkasten einzeln anzusteuern. Nun muss allerdings noch das selbstfahrende Fahrzeug, so
+angepasst werden, dass es bei einem bestimmten Ampelsignal auch wie vorhergesehen reagiert.
+Hierfür muss nun zunächst abgegrenzt werden, welche möglichen Ampelsignale in der Realität
+existieren. Laut § 37 „Wechsellichtzeichen, Dauerlichtzeichen und Grünpfeil“ der
+Straßenverkehrsordnung heißt es in Absatz 2: „Wechsellichtzeichen haben die Farbfolge Grün
+– Gelb – Rot – Rot und Gelb (gleichzeitig) – Grün.“ Somit gibt es vier verschiedene Szenarien
+für Ampelsignale: Rot, Gelb, Rot-Gelb und Grün. Im selbigen Absatz sind auch die
+Bedeutungen der jeweiligen Ampelsignale für den bei uns zutreffenden Fall einer Ampel vor
+einer Kreuzung definiert. So bedeutet ein grünes Lichtsignal: „Der Verkehr ist freigegeben“.
+Ein rotes Lichtsignal besagt: „Halt vor der Kreuzung“. Für das gelbe Lichtsignal gilt: „Vor der
+Kreuzung auf das nächste Zeichen warten“. Hierbei gilt grundsätzlich, dass wenn eine
+gefahrenlose Bremsung möglich ist (wenn beispielsweise kein hohes Verkehrsaufkommen ist
+und ein hinterherfahrendes Fahrzeug genügend Sicherheitsabstand besitzt), bei einem gelben
+37
+Abbildung 48: Istanziierung der "LichtAn"-Skripte im "CarEngine"-Skript
+Lichtsignal ebenfalls gehalten werden soll. Da allerdings in späteren Szenarien noch ein
+höheres Verkehrsaufkommen simuliert werden wird, wird für diesen Fall angenommen, dass
+das Auto die Kreuzung auch bei gelbem Lichtsignal passieren darf. Die Gelb-Rote Phase,
+welche ausschließlich auf die Rotphase der Ampel folgt, gilt allgemeinhin als
+Vorbereitungsphase für die Weiterfahrt (Die vier Ampelphasen, o.D.). Da in dieser Phase
+allerdings keine Weiterfahrt möglich ist, wird diese für dieses Szenario als einfache Haltephase
+verstanden. Somit ergeben sich für das selbstfahrende Fahrzeug vier verscheiden Ampelphasen
+mit den folgenden verbundenen Handlungen:
+• Grünes Lichtsignal: (Durch-)Fahren
+• Gelbes Lichtsignal: (Durch-)Fahren
+• Rotes Lichtsignal: (An-)Halten
+• Rot-Gelbes Lichtsignal: Halten
+Da nun die vier möglichen Szenarien abgegrenzt wurden, kann sich jetzt der Implementierung
+dieser Fälle gewidmet werden. Im vorigen Testfall, in welchem das selbstfahrende Fahrzeug
+simplifiziert an einer Ampel mit sämtlichen leuchtenden Lichtern (da diese zu diesem Zeitpunkt
+als noch ein ungetrenntes Mesh und damit als ein Licht definiert wurden) halten musste, wurde
+bereits in der if-Schleife innerhalb des für den rechts abgewinkelten Raycast verantwortlichen
+Befehls im CarEngine-Skript eine Abfrage des „on“-Booleans des „LichtAn“-Skripts
+durchgeführt. Da nun drei getrennte „LichtAn“-Skripte erstellt wurden und diese ebenfalls
+einen jeweiligen Wert für den jeweiligen Boolean ausgeben müssen, abhängig davon welcher
+der vier möglichen Fälle eintreten soll, können die jeweiligen erforderlichen booleschen Werte
+analog wie in Abbildung 46 als Bedingungen für einen der vier Fälle in der if-Schleife als
+Bedingung angegeben werden. Damit dies allerdings funktioniert muss vorher analog zu
+unserem vorigen Testcase jedes Skript innerhalb des „CarEngine“-Skripts instanziiert werden.
+Diese Instanzierung ist folgender Abbildung 48 zu sehen:
+Ebenfalls analog zu unserem vorherigen Testcase muss vor der if-Schleife des rechten
+abgewinkelten Raycasts ein Zugriff auf in diesem Fall die einzelnen drei „LichtAn“-Skripte
+erfolgen, was in Abbildung 49 zu erkennen ist:
+38
+Abbildung 49: Zugriffe auf die "LichtAn"-Skripte der Ampel aus dem "CarEngine"-Skript
+Abbildung 50: Fallunterscheidung im Falle eines grünen Ampelsignals
+Wenn die Instanziierung der Skripte und das Aufstellen der Zugriffsbefehle erfolgt sind,
+müssen die Bedingungen für die einzelnen möglichen Zustände der Ampel definiert werden.
+So wären die Bedingungen für den Fall einer grünen Ampel die folgenden: Der Raycast müsste
+zunächst die getaggte Ampel treffen, gleichzeitig muss die „on“-Variable des
+„GrünesLichtAn“-Skripts wahr sein, während die „on“-Variable sowohl beim
+„RotesLichtAn“-Skript, als auch beim „GelbesLichtAn“-Skript negativ sein muss, was in der
+Bedingung durch ein „!“ vor dem Abfragebefehl signalisiert werden muss. Als Folge dieser if-
+Schleife, wenn diese wahr sind, würde die Bremskraft des selbstfahrenden Fahrzeuges auf 0
+gestellt werden, da es bei einem grünen Lichtsignal die Kreuzung direkt passieren darf. Bei
+Einsetzen aller dieser Parameter in die if-Schleife ergibt sich ein Code, wie er in der folgenden
+Abbildung 50 zu erkennen ist.
+Mit dem „else if“-Bereich folgen die anderen vier Bedingungskombinationen analog zum
+obigen Beispiel des grünen Lichtsignals. Je nachdem, welche Lichter in den Fällen
+ausgeschaltet sind, wird für diese Lichter ein „!“ vor diese gesetzt bzw. vor den eingeschalteten
+Lichtern entfernt. Die folgenden Anweisungen sind im Falle eines gelben Ampelsignals
+dieselben wie im Falle des grünen. Im Falle des roten oder rot-gelben Ampelsignals würde
+jedoch die „0“ durch den Befehl „maxBrakeTorque“ ersetzt werden, wodurch das Auto bei den
+Ampelsignalen zum Stehen kommen würde. Kombiniert für alle vier möglichen Fälle von
+Ampelsignalen gemeinsam, würde sich der folgende Code in Abbildung 51 ergeben, welcher
+dem selbstfahrenden Fahrzeug ermöglichen würde, selbständig die vier möglichen
+Unterscheidungsfälle zu differenzieren und entsprechend darauf zu reagieren.
+39
+Abbildung 51: Gesamter Code zur Fallunterscheidung der verschiedenen Ampelszenarien
+Abbildung 52: Trennung der einzelnen Lichter in jeweils eigene Meshes
+Probleme & Lösungen
+Eines unserer größeren Probleme bei der Umsetzung des Ampel-Szenarios war die begrenzte
+Verfügbarkeit kostenlos zugänglicher Assets für Ampeln, bei welchen es möglich ist die Lichter
+einzeln einzusteuern. Zwar sind wir während der Recherchen auf zahlreiche Anleitungen
+gestoßen, welche allerdings auf jeweils kostenpflichtige Assets im Unity Assets Store
+verweisen. Nach Download eines der kostenlosen Ampel-Assets fiel bei genauerem Betrachten
+des Prefabs auf, dass sämtliche Lichter im selben Mesh hinterlegt sind, doch beim Öffnen des
+Prefabs innerhalb des Meshes einzeln auswählbar sind. Die Lösung war somit, dass das gesamte
+Mesh zweimal dupliziert und bei jedem Mesh jeweils zwei Lichter entfernt werden mussten.
+Hierdurch bekam jedes der drei Ampellichter einen jeweiligen eigenen Mesh, welcher dann mit
+den als Komponenten im GameObject Ampel hinterlegten „LichtAn“-Skripten verbunden
+werden konnten. Abbildung 52 zeigt die Aufteilung der drei Ampellichter auf eigene Meshes.
+40
+Abbildung 53: Raycast des Fahrzeugs scannt den BoxCollider der Ampel
+Ein weiteres Problem, mit welchem wir uns in der Umsetzung des Szenarios konfrontiert sahen,
+war, dass das selbstfahrende Fahrzeug auf die Ampel zufuhr, diese auch erkannte, jedoch oft
+durch die hohe Geschwindigkeit, welche das Auto nach dem Beschleunigen aus der Kurve
+mitnahm nicht schnell genug abbremsen konnte, der Raycast somit den BoxCollider zwar traf,
+jedoch dann wieder verpasste und das Auto dann wieder losbeschleunigte, obwohl die Ampel
+beispielsweise ein rotes Lichtsignal ausgab. Als Lösung dafür musste sichergestellt werden,
+dass der Raycast den BoxCollider länger erfasst, was letztendlich dadurch erzielt werden
+konnte, dass der BoxCollider der Ampel verlängert wurde (siehe Abb. 53). Somit kann der
+Raycast trotz des Bremsweges die Ampel erfassen und überprüfen, welches Signal momentan
+ausgegeben wird.
+Ein weiteres, kleineres Problem, welches im Verlauf der Bearbeitung auftauchte, war eine
+Fehlfunktion der R-Taste, welche für das Ein- und Ausschalten des roten Ampelsignals belegt
+wurde. So kam es vor, dass das Betätigen der Taste im Play-Modus von Unity einen Wechsel
+in das Scale-Tool veranlasste und nicht seine ursprüngliche angedachte Funktion erfüllte.
+Gelöst werden konnte das Problem dadurch, dass nach einem Klick auf das Game-View-Fenster
+der Tastenbefehl sich wieder auf das Spielgeschehen konzentrierte und nicht auf ein eventuelles
+Bearbeiten im Scene-View-Fenster.
+Als weitere Schwierigkeit im Zusammenhang mit dem Ampel-Szenario stellte sich der Zugriff
+auf Variablen eines Skripts dar, welches in einem anderen Objekt liegt, als das Skript, welches
+Zugriff auf die Variable benötigt. Dies war der Fall, als im Skript „CarEngine“ (welches im
+selbstfahrenden Fahrzeug hinterlegt war) über die boolesche Variable „on“ aus den
+41
+Abbildung 54: Problemlösung beim Zugriff auf eine objektfremde Variable
+verschiedenen „LichtAn“-Skripten (welche in der Ampel hinterlegt waren) der jeweilige
+Leuchtzustand der Ampelleuchten ermittelt werden sollte.
+Nach extensiver Literaturrecherche in Büchern, Anleitungen und Foren konnte der erste
+Lösungsansatz gefunden werden. Bevor das objektfremde Skript angesprochen werden kann,
+muss es zunächst innerhalb des anfordernden Skripts instanziiert werden. Anschließend kann
+dieser Instanz dann der Zugriff auf die Komponenten des anderen Skripts gewährt werden. An
+dieser Stelle folgt dann der zweite Lösungsansatz. Hier kann nämlich nicht, wie zunächst
+vermutet über den Befehl „Ampel.GetComponent<RotesLichtAn>“ gearbeitet werden, sondern
+über „GameObject.Find(“Ampel“). GetComponent<RotesLichtAn>“. Der Zugriff auf die
+„on“-Variable erfolgt dann an der benötigten Stelle über den Namen der Instanz des Skripts,
+sowie die benötigte Variable, was im Code dann beispielsweise über
+„myRotesLichtAnScript.on“ erfolgen kann. Abbildung 54 zeigt in Zeile 90 bis 92 den Zugriff
+auf die objektfremden Skripte und in Zeile 95 die konkrete Abfrage der Variable.
+2.7 Szenario 5: Kreuzung
+Beschreibung:
+Dieses Szenario baut auf dem zweiten Szenario der Hinderniserkennung auf. Das Auto
+beschleunigt und fährt endlos den Rundkurs ab. Da wir bereits ein Schildszenario entwickelt
+haben, beschränken wir uns hier auf die „Rechts vor Links“-Regelung. Sobald das Auto an eine
+Kreuzung heranfährt, scannt es die Umgebung nach weiteren Verkehrsteilnehmer ab und
+reagiert dementsprechend darauf. Wenn das Auto von rechts kommende Fahrzeuge erkennt,
+bremst es ab und lässt sie vorbeifahren. Sobald keine weiteren Fahrzeuge mehr erkannt werden,
+beschleunigt das Auto wieder und fährt den Rundkurs weiter ab.
+42
+Struktogramm:
+Abbildung 55: Struktogramm Kreuzungsszenario
+Vorgehen:
+Da der bisher verwendete Pfad bereits von einem Fahrzeug verwendet wird, musste ein neuer
+Pfad angelegt werden. Bei der Erstellung des neuen Pfades wurden wieder Nodes verwendet.
+Jedoch musste bei diesem neuen Pfad darauf geachtet werden, dass ein neuer Startpunkt
+definiert wird. Dieser neue Startpunkt muss auf dem Rundkurs so platziert werden, dass die
+neuen Fahrzeuge von dort zum ungefähr gleichen Zeitpunkt bei der Kreuzung eintreffen wie
+die anderen Fahrzeuge auch.
+Das bisher verwendete Fahrzeug konnte nicht
+ohne weiteres für den neuen Pfad verwendet
+werden. Daher musste das bisherige Fahrzeug
+dupliziert und in die Nähe des neuen
+Startpunktes gebracht werden. Nachdem das
+neue Fahrzeug verschoben wurde, musste
+diesem noch das neue Skript und der neue Pfad
+zugewiesen werden. Damit der Effekt der „Rechts vor Links“-Regelung erkannt wird, wurde
+nicht nur ein neues Auto eingefügt, sondern fünf. Von diesen fünf neuen Fahrzeugen wurde
+lediglich dreien das neue Skript und der neue Pfad zugewiesen (siehe Abb. 56 und Abb. 57).
+Abbildung 56: Auto 1 mit Pfad 1
+Abbildung 57: Auto 2 mit Pfad 2
+43
+Nach den ersten Probeläufen der Version mit dem neuen Pfad und den neuen Autos musste die
+Positionierung der Autos noch angepasst werden. Dies war notwendig, damit die Autos auch
+zur richtigen Zeit an der Kreuzung ankommen. Die Position der alten Fahrzeuge wurde soweit
+angepasst, dass diese den gleichen Abstand zueinander haben (siehe Abb. 58).
+Sobald die Fahrzeuge beschleunigen wird der Abstand mit Hilfe der Raycasts eingehalten
+(siehe Abb. 59).
+Da das hier gezeigt Szenario auf dem Hindernisszenario aufbaut, verwenden die Autos auch
+die gleiche Funktion um das „Hindernis“, in diesem Fall das andere Fahrzeug, zu erkennen.
+Diese Fahrzeuge werden also mit Hilfe von Raycasts erkannt. Jedoch mussten auch bei den
+Raycasts Änderungen für dieses Szenario vorgenommen werden. Um die rechts vor links
+Regelung auch korrekt umsetzen zu können, musste der linke Raycast der neuen Fahrzeuge
+deaktiviert werden, da sonst bei beiden Fahrzeugen die Sensoren ein „Hindernis-Fahrzeug“ auf
+der linken Seite erkannt hätten und der Verkehr zum Stillstand gekommen wäre. Dies war
+lediglich eine kleine Änderung innerhalb des CarEngine-Skripts, welche durch das
+Auskommentieren des entsprechenden Codes erzielt werden konnte.
+Abbildung 58: Gleicher Abstand der Autos zueinander
+Abbildung 59: Einhalten der „Rechts vor Links“-Regel mit Hilfe der Raycasts
+44
+Probleme & Lösungen:
+Da für dieses Szenario mehrere Fahrzeuge benötigt werden, wurde zu Beginn das erste
+Fahrzeug kopiert und neu eingefügt. Da drei der neuen Fahrzeuge ein anderes Skript benötigten,
+mussten die Fahrzeuge neu dupliziert und mit einem extra Skript bestückt werden.
+Da die Startposition des Pfades festgelegt werden musste, konnte nicht der gleiche Pfad für alle
+Fahrzeuge verwendet werden. Die neu eingefügten Fahrzeuge folgten nicht dem Pfad, sondern
+bewegten sich quer über das Feld zur ersten Startposition des alten Pfades. Somit musste ein
+neuer Pfad angelegt und den neuen Fahrzeugen zugewiesen werden.
+Nachdem nun alle Fahrzeuge und das Skript angepasst wurden, wurde beim Testlauf allerdings
+bemerkt, dass die Fahrzeuge nicht zur gleichen Zeit an der Kreuzung ankamen. Dieses Problem
+konnten jedoch durch die richtige Positionierung der Fahrzeuge behoben werden.

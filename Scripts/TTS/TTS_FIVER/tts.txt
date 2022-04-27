@@ -1,0 +1,195 @@
+2.3 Szenario 1: Selbstständiges Fahren
+Beschreibung:
+Das erste Szenario, welches im Rahmen des Projekts der Programmierung in Unity umgesetzt
+werden sollte, sollte die selbständige Fahrt des Autos realisieren. Hierbei sollte das Auto eine
+vorgegebene Wegstrecke ohne Hindernisse abfahren können und stets einem vorgegebenen
+Pfad folgen.
+Vorgehen:
+Nach der erfolgreichen Einarbeitung in die Entwicklungsumgebung, wurde über die mögliche
+Umsetzung des Szenarios diskutiert. Zuerst musste ein Rundkurs erstellt werden. Die einzelnen
+Komponenten für den Rundkurs, bestehend aus Geraden und verschiedenen
+Kurven sowie einer Kreuzung, wurden aus dem Unity Asset Store bezogen. Innerhalb des
+Unity Asset Stores werden Assets, Texturen, Animation und Modelle bis hin zu
+Projektbeispielen von Unity Technologies sowie von der Community veröffentlicht. Der Unity
+Asset Store bietet eine Mischung aus kostenlosen und kostenpflichtigen Assets an. Bei der
+Erstellung des Rundkurses musste auf die exakte Positionierung der einzelnen
+Komponenten zueinander geachtet werden. Durch die korrekte Anordnung der Einzelteile
+entstand eine einheitliche und zusammenhängende Strecke. Nach Fertigstellung der Strecke
+musste ein Auto eingefügt werden. Dieses Auto wurde ebenfalls aus dem Unity Asset Store
+bezogen. Hierzu wurde das Auto mitsamt physikalischem Körper des Fahrzeugs (im Spiel Body
+genannt) in das Spiel eingefügt. Dem Auto musste noch ein sogenannter Rigidbody
+hinzugefügt werden, welcher dem Auto die physikalischen Verhaltensweisen eines Objektes
+verleiht. Zudem benötigte die Straße und das Auto noch Collider. Collider sind dafür zuständig,
+dass Gegenstände mit anderen Gegenständen interagieren können und beispielsweise das Auto
+nicht durch die Straße hindurch fällt. Nachdem der Rundkurs sowie das Auto
+erstellt wurden, eröffnete sich die Frage wie genau die Fahrt des Autos realisiert
+werden konnte. Nach intensiver Recherche ergab sich die Möglichkeit einen Pfad mit Hilfe
+von Wegpunkten zu realisieren. Diese sogenannten Nodes sind leere Spielobjekte ohne jegliche
+optische Form und ohne festgelegte Koordinaten, welche im Folgenden zum Generieren des
+Pfades genutzt werden. Die Koordinaten der Nodes werden im Verlauf der Erstellung des
+Pfades festgelegt. Anhand der Abbildung 2 wird eine solche Node mit festgelegten
+Koordinaten im Transform dargestellt.
+13
+Nachdem die Nodes in die Game Scene eingefügt
+wurden, müssen diese auf dem Rundkurs abgelegt
+werden. Dabei ist auf einen nicht zu großen und
+nicht zu geringen Abstand zu achten. Zusätzlich
+sollte die Node auf der Höhe des Autos liegen. Im Folgenden wurde im Programmcode eine
+Linie als Variable definiert. Diese Linie soll die Verbindung zwischen den Nodes später
+sichtbar machen. Die visuelle Darstellung der Verbindungen der einzelnen Nodes erleichtert es
+Fehlverbindungen zu entdecken und somit später Bugs beseitigen zu können.
+Die Nodes werden in einer Liste vom Typ Transform gespeichert (siehe Abb. 2).
+Mit Hilfe der „start“ Funktion wird der Programmcode in Unity gestartet. Die Funktion
+„update“ aktualisiert kontinuierlich die Grafikoberfläche.
+Da die Funktion „update“, die Verbindung der Node, nicht im Editor anzeigen kann sondern
+nur „inGame“, muss eine andere Funktion verwendet werden. Diese Funktion muss die
+Fähigkeit haben, im Rahmen des Editors ausgeführt zu werden. Dazu wird die Funktion Gizmos
+verwendet (EYEmaginary, Car AI Tutorial #1 (Unity 5 ) - Make the Path, 2016). Gizmos ist ein
+Werkzeug, welches es ermöglicht visuelle Debug-Arbeiten zu vollziehen (Unity Technologies,
+2020).
+Der nächste Schritt ist die Programmierung der Verbindungen der einzelnen
+„Nodes“. Zunächst wird die Funktion „OnDrawGizmos“ verwendet. Im Anschluss wird der
+Linie, welche von dieser Funktion gezeichnet werden soll, eine Farbe zugewiesen. Danach wird
+ein Array „path.Transforms“ verwendet. Die „GetComponentsInChildren“ Funktion gibt alle
+Werte zurück, die dem Typ Transform entsprechen.
+Über eine for-Schleife werden die Werte des „path.Transform“ und des normalen „Transform“
+verglichen. Wenn diese Werte nicht übereinstimmen, werden die Werte der Liste Nodes
+hinzugefügt.
+Mit einer weiteren for-Schleife werden nun kontinuierlich alle Nodes durchlaufen, um die
+Verbindungslinie zwischen den „Nodes“ aufzuzeichnen. Dafür werden mit Hilfe der for-
+Schleife die Werte der „Nodes“-Liste durchlaufen. Zuerst werden die Vektoren für die aktuelle
+Node und die vorherige Node definiert. Da die Zahlenreihe der Nodes auch bei null stehen
+kann, die vorherige Node jedoch nicht „-1“ ist, muss noch abgeprüft werden ob der i-Wert
+größer null ist. Sollte dies nicht der Fall sein, wird von dem höchsten Wert der Liste „Nodes“
+der Wert 1 abgezogen, um die vorherige Node zu bestimmen.
+Abbildung 2: Koordinaten und Werte einer Node
+14
+Am Ende wird mit Hilfe der Gizmos-Funktion noch die Linie zwischen den Nodes, sowie
+eine kleine Kugel um die diversen „Nodes“, gezeichnet. Dadurch werden die „Nodes“
+beziehungsweise Wegpunkte, in der Scene View besser sichtbar. Dieses Skript war
+die Grundlage, damit das Auto unseren Rundkurs abfahren kann (siehe Abb. 3) (EYEmaginary,
+Car AI Tutorial #1 (Unity 5 ) - Make the Path, 2016).
+Damit das Auto in der Lage ist zu fahren, müssen diesem noch „WheelCollider“ hinzugefügt
+werden. Diese „WheelCollider“ haben die Funktion, die Räder während der Fahrt auch an ihrer
+festgelegten Position zu halten. Dafür wurden die tatsächlichen
+Räder des Autos in einen eigenen Ordner „Wheels“ verschoben und
+ein neuer Ordner „WheelColliders“ angelegt. In den Ordner
+„WheelColliders“ wurden anschließend die „WheelCollider“ für
+jedes Rad definiert (siehe Abb. 4). Diese „WheelCollider“ müssen
+an der exakt gleichen Position angebracht werden wie die
+„Wheels“. Im Anschluss wurde der „Mesh“, das visuelle Abbild der
+Räder, entfernt. Dann wurde dem Auto ein Rigidbody hinzugefügt und die Masse des Autos
+festgelegt. Danach wurde dem Body des Autos ein „MeshCollider“ mit der Funktion „Convex“
+hinzugefügt. Dies sorgt dafür, dass der gesamte Body als ein Kollisionsmodell angesehen wird
+und auch als solches berechnet wird. Nachdem den Rädern die „WheelCollider“ hinzugefügt
+wurde, muss der Radius der „WheelCollider“ noch auf den „Mesh“ der Räder und die
+„Suspension Distance“, angepasst werden. Dies wird im Fenster
+der „WheelCollider“ umgesetzt (siehe Abb. 5). Hierbei spielen
+die „WheelCollider“ eine sehr wichtige Rolle, da diese den
+Kontakt zur Fahrbahn festlegen und somit auch den Abstand zu
+dieser definieren. Wenn man nach diesem Schritt auf „Play“
+Abbildung 3: Darstellung des Programmcodes für die "Nodes"
+Abbildung 4: Darstellung der
+Wheels und WheelColliders
+Abbildung 5: Anpassung des Radius
+und der Suspension Distance eines
+WheelCollider
+15
+drückt, sollte das Auto, aus seiner schwebenden Position auf die Fahrbahn „fallen“ und nicht
+durch den Boden hindurch. (EYEmaginary, Car AI Tutorial #2 (Unity 5 ) - Wheel Colliders,
+2016).
+Damit das Auto auch selber fahren und lenken kann, wird durch ein neues Skript der Motor
+„eingebaut“ und dem Auto eine Lenkung programmiert. Dazu wird in das neue Skript zuerst
+die Liste der „Nodes“ importiert sowie der Array, welcher den gesamten Pfad enthält. Um nun
+die Lenkung des Autos zu realisieren wird mit Hilfe von Vektoren die Richtung bestimmt, in
+welche sich das Auto bewegen soll. Hierbei wird der Differenzvektor zwischen der aktuellen
+und der nächsten Node ermittelt.
+Damit man auf den Grad der Lenkung schließen kann,
+wird der „relativeVektor“ mit dem „maxSteerAngle“
+multipliziert. Dieser „maxSteerAngle“ wurde von uns auf 45f gesetzt. Dieser neue Grad muss
+den Fronträdern noch zugewiesen werden. Dafür wird „Wheel FL“ und „Wheel FR“ der
+passende „WheelCollider“ für das Skript „carengine“ zugewiesen (siehe Abb.
+6) (EYEmaginary, Car AI Tutorial #3 (Unity 5) - Steering by Itself, 2016). Da nun die
+Steuerung des Autos funktioniert, fehlt noch dessen Antrieb. Dafür wird die Funktion „Drive“
+verwendet. Innerhalb dieser Funktion wird das Drehmoment des Motors definiert. Dieses wird
+mit der Funktion „.motorTorque“ abgerufen. Dabei definiert man das Drehmoment der Reifen
+über „maxMotorTorque“, welches am Anfang initialisiert wird. Als letzter Schritt wird noch
+die Variable „currentSpeed“ definiert, da man die aktuelle Geschwindigkeit auslesen möchte.
+Zusätzlich setzt man „maxSpeed“ noch auf 100. Um die Geschwindigkeit des Autos auslesen
+zu können, wird eine mathematische Formel angewendet. Dazu wird über die Geschwindigkeit
+der Radumdrehung die Geschwindigkeit des Autos berechnet. Zudem wird dauerhaft abgefragt,
+ob die aktuelle Geschwindigkeit geringer als „maxSpeed“ ist und das Auto auch nicht bremst.
+Wenn dies der Fall ist wird das Drehmoment auf „maxMotorTorque“ gesetzt, um das Auto auf
+die maximal gewünschte Geschwindigkeit zu setzen. Wenn dies nicht der Fall ist, wird das
+Drehmoment auf 0 gesetzt und es wird nicht weiterbeschleunigt (siehe Abb. 7) (EYEmaginary,
+Car AI Tutorial #4 (Unity 5) - Moving the Car, 2017).
+Abbildung 7: Mathematische Formel zur Berechnung der aktuellen
+Geschwindigkeit
+Abbildung 6: Zuweisung der WheelCollider
+16
+Zusätzlich ist noch eine Funktion notwendig, welche die Distanz zur
+nächsten „Node“ angibt. Die Funktion „CheckWaypointDistance“ ermittelt die Distanz
+zwischen der aktuellen Position des Autos und der Position der nächsten „Node“. Sollte die
+Distanz unter einen festgelegten Wert fallen, steuert das Auto direkt die nächste Node an und
+stellt seine Lenkung entsprechend um (siehe Abb. 8) (EYEmaginary, Car AI Tutorial #4 (Unity
+5) - Moving the Car, 2017). Somit wird ein Zeitpunkt festgelegt, zu welchem sich das Fahrzeug
+auf die nächste Node konzentriert.
+Da sich zu dem jetzigen Zeitpunkt die Räder nicht drehen
+und sie sich nur statisch mit dem Auto mit bewegen, wird
+den Rädern noch ein Skript hinzugefügt, welches die
+Raddrehung animieren soll. Dazu wird jedem Rad
+der passende „WheelCollider“ zugewiesen (siehe Abb. 9).
+Nun werden im Skript eine neue Vektorvariable und ein neuer „Quaternion“ initialisiert.
+Ein „Quaternion“ ist eine Möglichkeit im 3D-Raum von Unity eine Rotation eines Objektes
+darzustellen. Im Anschluss wird mit Hilfe von „targetWheel“ die abgerufene Information
+abgespeichert (siehe Abb. 10).
+Der Transformbefehl ruft die aktuelle Position und Rotation ab. Damit das Auto während der
+Fahrt etwas stabiler fährt und nicht so leicht umkippen kann, wird noch ein „centerOfMass“
+definiert. Diese Variable wird in der Start-Funktion dem Rigidbody des Autos
+hinzugefügt (siehe Abb. 11).
+Dadurch kann diese Variable durch uns selbst festgelegt werden (EYEmaginary, Car AI
+Tutorial #5 (Unity 5) - Wheel Motion, 2017). Damit ist das erste Szenario fertig, das Auto fährt
+nun von allein den von uns vorgegebenen Rundkurs ab.
+Abbildung 8: Überprüfen der Distanz bis zur nächsten "Node"
+Abbildung 9: Zuweisung der
+WheelCollider für die visuelle Drehung
+Abbildung 10: Speicherung der notwendigen Information mit Hilfe von targetWheel
+17
+Probleme & Lösungen:
+Während des Projekts stellte sich uns die Frage wie das Auto die Strecke abfahren kann.
+Hierzu musste viel recherchiert und nach Lösungen gesucht werden. Viele Lösungen, die
+gefunden wurden, waren jedoch vorgefertigte Landschaften aus dem Asset Store oder basierten
+auf einer Künstlichen Intelligenz, welche Hindernisse erkennen sollte. Diese Lösungen waren
+aus mehreren Gründen nicht zielführend. Unter anderem, da viele der Lösungen nur gegen
+Bezahlung freigeschalten werden konnten oder in ihrer Komplexität unsere mögliche Kapazität
+für dieses Projekt bei weitem überschritten. Somit musste nach anderen
+Lösungen Ausschau gehalten werden. Nach langer Suche wurde man bei einem Programmierer
+auf YouTube fündig. Dieser machte etliche Programmier Tutorials und stellte die Möglichkeit
+der Orientierung mit Hilfe von „Nodes“ vor. Diese Lösung schien elegant, verständlich und
+nicht zu komplex. Vergleichbar ist dies mit dem Fahren nach einem Navigationsgerät. Denn
+auch hier hat man festgelegte Wegpunkte, welche man abfahren muss, um an sein Ziel zu
+kommen. Somit fährt das Auto von einer „Node“ (Wegpunkt) zu der nächsten „Node“.
+Nachdem das erste Problem mithilfe der „Nodes“ gelöst wurde, setzte sich die Erkenntnis
+durch, dass das Auto durch den Boden hindurch fliegt, wenn auf Play gedrückt wurde.
+Aufgrund dieses Problems war ein noch tieferes Verständnis der Entwicklungsumgebung von
+Unity notwendig. Mit einem umfangreicheren Wissen, wurde klar, dass Gegenstände in Unity
+„Collider“ benötigen, um miteinander zu interagieren. Mithilfe der „Collider“ erkennen die
+Objekte einen Zusammenprall mit einem anderen Objekt und fallen nicht einfach hindurch. Bei
+der Lösung dieses Problems wurde erkannt, dass das Auto einen „Rigidbody“ benötigt. Dieser
+verleiht einem Objekt physikalische Eigenschaften, wodurch sich das Auto „physikalisch
+korrekt“ verhält.
+Das letzte große Problem im Rahmen dieses Szenarios betraf die Räder des Autos. Als es an
+die Realisierung für die Drehung der Reifen ging, ergab sich die Möglichkeit die Rotation der
+Reifen mit Hilfe der „Quaternion“ Funktion zu ermöglichen. Als der Code fertig
+geschrieben war und das Ergebnis vorlag, haben sich die Räder auf ihre Felge gelegt und
+während der Fahrt um ihre eigene Achse rotiert. Die Lösung dieses Problems kostete sehr viel
+Abbildung 11: Definieren der "centerOfMass" Variable
+18
+Abbildung 12: Struktogramm für das Hindernis
+Zeit, da der Fehler lange Zeit nicht aufgefunden wurde. Am Ende stellte sich heraus, dass die
+Räder, welche bei dem Auto aus dem Asset Store dabei waren, falsch positioniert waren. Somit
+mussten einzelne Räder als Assets aus dem Asset Store heruntergeladen und an das
+Auto angebracht werden. Nachdem dies erledigt war, drehten sich die Räder wie bei einem
+realen Auto.
+
+2.4 Szenario 2: Hinderniserkennung ENDE.

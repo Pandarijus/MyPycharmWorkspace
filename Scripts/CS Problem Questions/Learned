@@ -1,0 +1,7 @@
+last field of list = list[-1]
+append to a list =   list.append(4)
+print("Variable:",x)
+print("Hi",end = "THIS IS THE END OF THE STRING.")
+print(*list)
+a = 1 if steps%2 == 0 else -1
+for x in range(0,len(array))  is gonna go through the array perfectly. No -1 needed
