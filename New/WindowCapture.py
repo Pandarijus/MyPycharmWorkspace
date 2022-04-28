@@ -14,11 +14,17 @@ class WindowCapture:
     offset_y = 0
 
     # constructor
-    def __init__(self, window_name):
-        # find the handle for the window we want to capture
-        self.hwnd = win32gui.FindWindow(None, window_name)
-        if not self.hwnd:
-            raise Exception('Window not found: {}'.format(window_name))
+    def __init__(self, window_name = None):
+
+        if window_name is None:
+            self.hwnd = win32gui.GetForegroundWindow()
+            print('WindowCapture: using foreground window'+str(self.hwnd))
+        else:
+            #if window_name.startswith('0x'):
+            #    self.hwnd = int(window_name, 16)
+            self.hwnd = win32gui.FindWindow(None, window_name)
+            if not self.hwnd:
+                raise Exception('Window not found: {}'.format(window_name))
 
         # get the window size
         window_rect = win32gui.GetWindowRect(self.hwnd)
@@ -64,7 +70,7 @@ class WindowCapture:
         # drop the alpha channel, or cv.matchTemplate() will throw an error like:
         #   error: (-215:Assertion failed) (depth == CV_8U || depth == CV_32F) && type == _templ.type()
         #   && _img.dims() <= 2 in function 'cv::matchTemplate'
-        img = img[...,:3]
+        #MY TEMP COMMENT##########img = img[...,:3]
 
         # make image C_CONTIGUOUS to avoid errors that look like:
         #   File ... in draw_rectangles
@@ -78,10 +84,11 @@ class WindowCapture:
     # find the name of the window you're interested in.
     # once you have it, update window_capture()
     # https://stackoverflow.com/questions/55547940/how-to-get-a-list-of-the-name-of-every-open-window
-    def list_window_names(self):
+    @staticmethod
+    def list_window_names():
         def winEnumHandler(hwnd, ctx):
             if win32gui.IsWindowVisible(hwnd):
-                print(hex(hwnd), win32gui.GetWindowText(hwnd))
+                print(hex(hwnd),'"'+ win32gui.GetWindowText(hwnd) + '"')#
         win32gui.EnumWindows(winEnumHandler, None)
 
     # translate a pixel position on a screenshot image to a pixel position on the screen.
