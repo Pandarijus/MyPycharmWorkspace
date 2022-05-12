@@ -8,6 +8,7 @@ banChamp = 'yasuo'
 
 champs = {'sy':'sylas','il':'illaoi','ra':'rakan','py':'pyke','ya':'yasuo','no':'nocturne'}
 
+
 def wait():
     sleep(0.5)
 def getImagePos(imgName):
@@ -60,7 +61,8 @@ def startPlaying():
     clickOnImage('RankedFlex.png')
     clickOnImage('Confirm.png')
     clickOnImage('SelectLane.png')
-    clickOnImage('TopLane.png')
+    #clickOnImage('TopLane.png')
+    clickOnImage('JungleLane.png')
     clickOnImage('SelectLane.png')
     clickOnImage('SupportLane.png')
 
@@ -75,8 +77,6 @@ def yeeting():
     else:
         print("Can't see Play")
     clickOnImage('FindMatch.png',True)
-    if isNotInQueue():
-        clickOnImage('FindMach.png')
     clickAndCheckQueue()
     clickOnImage('Search.png')
     keyboardWrite(champs[champ])
@@ -85,6 +85,7 @@ def yeeting():
     clickOnImage('Search.png')
     keyboardWrite(banChamp)
     clickOnImage(banChamp+'.png')
+    clickOnImage('Ban.png')
     exit()
 
 
