@@ -1,1 +1,1 @@
-start cmd /k "C:\Users\krott\Documents\_AllSaves\MyPycharmWorkspace\Scripts\SocetsUnity\NewRecive.py"
+start cmd /k "C:\Users\krott\Documents\_AllSaves\MyPycharmWorkspace\Scripts\SocetsUnity\MainRecive.py"
