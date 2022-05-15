@@ -1,0 +1,1 @@
+start cmd /k "C:\Users\Jakob\Documents\GitHub\MyPycharmWorkspace\Scripts\SocetsUnity\tcpStreamVideoServer.py"
