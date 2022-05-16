@@ -39,7 +39,7 @@ with mpHol.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5)as
                 lis.append(x)
                 lis.append(y)
                 lis.append(z)
-            with open('mySaves.csv', 'a', newline='') as file:
+            with open('../old/mySaves.csv', 'a', newline='') as file:
                 wr = csv.writer(file,delimiter=',',quotechar='"',quoting=csv.QUOTE_MINIMAL)
                 #header = ['class','x1','y1','z1','...']
                 #wr.writerow(header)
