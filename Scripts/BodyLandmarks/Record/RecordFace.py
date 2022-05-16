@@ -8,7 +8,7 @@ def drawPoint(img,l,size):
     pos = (x, y)
     return cv.circle(img, pos, size, (255, 0, 0), -1)
 #-----------------------------INPUT HERE----------------------------#
-fileName = "face.csv"
+fileName = "../old/face.csv"
 mood = "right eye closed"
 #-------------------------------------------------------------------#
 
