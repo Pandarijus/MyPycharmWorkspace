@@ -8,8 +8,12 @@ def drawPoint(img,l,size):
     pos = (x, y)
     return cv.circle(img, pos, size, (255, 0, 0), -1)
 #-----------------------------INPUT HERE----------------------------#
-fileName = "../old/abend.csv"
-mood = "Offene Hand"
+fileEnding ="csv"
+fileName = "HandRightSigns"
+path = f"Saves/Model/{fileName}.{fileEnding}"
+lable = "Faust"
+shouldSave = True
+dotSize = 5
 #-------------------------------------------------------------------#
 
 vid = cv.VideoCapture(0)
@@ -26,24 +30,24 @@ with mpHol.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5)as
         img = cv.cvtColor(img, cv.COLOR_BGR2RGB)  # img to rgb
 
         re = hol.process(img)
-        lis = [mood]
+        mpDraw.draw_landmarks(img, re.right_hand_landmarks, mpHol.HAND_CONNECTIONS)
+        lis = [lable]
         if re.right_hand_landmarks:
             for l in re.right_hand_landmarks.landmark:
-                img = drawPoint(img,l,10)
-                x = l.x
-                y =l.y
-                z =l.z
-                lis.append(x)
-                lis.append(y)
-                lis.append(z)
+                #img = drawPoint(img,l,dotSize)
+                lis.append(l.x)
+                lis.append(l.y)
+                lis.append(l.z)
 
-            if True:
-                with open(fileName,'a',newline='') as file:
+            if shouldSave:
+                with open(path,'a',newline='') as file:
                     wr = csv.writer(file,delimiter=',')#,quotechar='"',quoting=csv.QUOTE_MINIMAL
                     wr.writerow(lis)
 
-        cv.imshow("hh", cv.flip(img,1))
-        if cv.waitKey(20) & 0xFF == ord('d'):  # Quit
+        img = cv.flip(img,1)
+        img = cv.cvtColor(img,cv.COLOR_BGR2RGB)
+        cv.imshow("You", img)
+        if cv.waitKey(20) != -1:  # Quit
             break
 
 vid.release()

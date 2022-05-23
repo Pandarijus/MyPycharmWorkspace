@@ -4,14 +4,12 @@ import cv2 as cv
 import mediapipe as mp
 import numpy as np
 
-
-
 #---------------
-pickleRick = 'abend.pkl'
+fileEnding ="pkl"
+fileName = "HandRightSigns"
+path = f"Saves/Model/{fileName}.{fileEnding}"
 #---------------
-
-
-with open(pickleRick,'rb') as file:
+with open(path,'rb') as file:
     model = pickle.load(file)
 
 vid = cv.VideoCapture(0)
@@ -57,16 +55,16 @@ with mpHol.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5)as
         if re.right_hand_landmarks:#face_landmarks
             for l in re.right_hand_landmarks.landmark:#face_landmarks
                 # ---------------
-                img = drawPoint(img,l,10)
+                img = drawPoint(img,l,8)
                 lis += [l.x,l.y,l.z]
 
             data = pd.DataFrame([lis])
             aiGuess = model.predict(data)[0]
 
-
+            img = cv.flip(img, 1)
             img = cv.putText(img, aiGuess, (50, 50), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
             laplace = "Hand" in aiGuess
-
+            img = cv.flip(img, 1)
 
 
 
@@ -86,10 +84,10 @@ with mpHol.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5)as
             #img = canny(img)
 
 
-#        img = cv.flip(img, 1)
+        img = cv.flip(img, 1)
         img = cv.cvtColor(img, cv.COLOR_RGB2BGR)
-        cv.imshow("hh", img)
-        if cv.waitKey(20) & 0xFF == ord('d'):  # Quit
+        cv.imshow("You", img)
+        if cv.waitKey(20) != -1:  # Quit
             break
 
 

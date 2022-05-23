@@ -7,9 +7,12 @@ from sklearn.ensemble import RandomForestClassifier,GradientBoostingClassifier
 from sklearn.metrics import accuracy_score
 import pickle
 
-fileName = "old/abend.csv"
+fileEnding ="csv"
+fileName = "HandRightSigns"
+path = f"Saves/Model/{fileName}.{fileEnding}"
+pickSpecificPipeline = False#'rf'
 
-df = pd.read_csv(fileName,header=None)
+df = pd.read_csv(path,header=None)
 x = df.drop(columns=df.columns[0],axis=1)
 y = df.iloc[:, 0]
 
@@ -22,17 +25,31 @@ pipes = {
 }
 #print(pipes.keys())
 models = {}
+
 for index,pip in pipes.items():
+    print("Starting Training:",index)
     model = pip.fit(xTrain,yTrain)
     models[index] = model
 
-for index,model in models.items():
-    yAi = model.predict(xTest)
-    print(index,accuracy_score(yTest,yAi))
+if pickSpecificPipeline:
+    pick = pickSpecificPipeline
+else:
+    highestScore = 0
+    highestPipe = 0
+    for modelName, model in models.items():
+        yAi = model.predict(xTest)
+        accuracy = accuracy_score(yTest, yAi)
+        print(modelName, accuracy * 100, "%")
+        if accuracy > highestScore:
+            highestScore = accuracy
+            highestModel = modelName
+    pick = highestModel
+print("The best Model: [",pick,"]")
 
-pick = input("which model do you like best?")
-if pick not in models:
-    pick = 'rf'
+# pick = input("which model do you like best?")
+# if pick not in models:
+#     pick = 'rf'
 
-with open(fileName[:-4]+'.pkl','wb') as file:
+with open(path[:-4]+'.pkl','wb') as file:
     pickle.dump(models[pick],file)
+    print("Saved [", pick, "]")
