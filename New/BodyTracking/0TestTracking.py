@@ -4,7 +4,7 @@ import mediapipe as mp
 
 
 #-----------------------------INPUT HERE----------------------------#
-inputs = [1,1,1,1]
+inputs = [0,0,0,1]
 faceTracking = inputs[0]
 bodyTracking = inputs[1]
 leftHandTracking = inputs[2]

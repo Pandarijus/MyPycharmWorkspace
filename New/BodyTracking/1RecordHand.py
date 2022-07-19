@@ -12,7 +12,7 @@ fileEnding ="csv"
 fileName = "HandRightSigns"
 path = f"Saves/Model/{fileName}.{fileEnding}"
 lable = "Faust"
-shouldSave = True
+shouldSave = 0
 dotSize = 5
 #-------------------------------------------------------------------#
 
